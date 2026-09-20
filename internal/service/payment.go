@@ -1,35 +1,29 @@
 package service
 
 import (
-	"sync"
+	"context"
+
+	"github.com/d1zyy/payment-api/internal/model"
 )
 
-type Payment struct {
-	ID     int
-	Amount int
+type PaymentRepository interface {
+	Create(ctx context.Context, payment model.Payment) (model.Payment, error)
 }
 
 type PaymentService struct {
-	mu     sync.Mutex
-	nextID int
+	repo PaymentRepository
 }
 
-func NewPaymentService() *PaymentService {
+func NewPaymentService(repo PaymentRepository) *PaymentService {
 	return &PaymentService{
-		nextID: 1,
+		repo: repo,
 	}
 }
 
-func (s *PaymentService) Create(amount int) Payment {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	payment := Payment{
-		ID:     s.nextID,
+func (s *PaymentService) Create(ctx context.Context, amount int) (model.Payment, error) {
+	payment := model.Payment{
 		Amount: amount,
 	}
 
-	s.nextID++
-
-	return payment
+	return s.repo.Create(ctx, payment)
 }

@@ -39,7 +39,11 @@ func (h *PaymentHandler) CreatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payment := h.service.Create(req.Amount)
+	payment, err := h.service.Create(r.Context(), req.Amount)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 	response := CreatePaymentResponse{
 		ID:     payment.ID,
 		Amount: payment.Amount,
