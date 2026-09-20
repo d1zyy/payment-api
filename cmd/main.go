@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/d1zyy/payment-api/internal/handler"
+	"github.com/d1zyy/payment-api/internal/repository"
 	"github.com/d1zyy/payment-api/internal/service"
 )
 
@@ -21,8 +22,9 @@ func main() {
 	}
 
 	//service payment
-	payment := service.NewPaymentService()
-	paymentHandler := handler.NewPaymentHandler(payment)
+	paymentRepo := repository.NewMemoryPaymentRepository()
+	paymentService := service.NewPaymentService(paymentRepo)
+	paymentHandler := handler.NewPaymentHandler(paymentService)
 
 	//endpoint
 	mux.HandleFunc("GET /health", handler.Health)
