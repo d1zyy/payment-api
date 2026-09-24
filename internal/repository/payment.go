@@ -8,7 +8,7 @@ import (
 )
 
 type MemoryPaymentRepository struct {
-	mu       sync.Mutex
+	mu       sync.RWMutex
 	nextID   int
 	payments map[int]model.Payment
 }
@@ -29,4 +29,15 @@ func (r *MemoryPaymentRepository) Create(ctx context.Context, payment model.Paym
 	r.nextID++
 
 	return payment, nil
+}
+
+func (r *MemoryPaymentRepository) GetByID(ctx context.Context, id int) (model.Payment, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if payment, exists := r.payments[id]; exists {
+		return payment, nil
+	}
+
+	return model.Payment{}, model.ErrPaymentNotFound
 }
