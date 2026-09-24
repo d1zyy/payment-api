@@ -29,6 +29,7 @@ func main() {
 	//endpoint
 	mux.HandleFunc("GET /health", handler.Health)
 	mux.HandleFunc("POST /payments", paymentHandler.CreatePayment)
+	mux.HandleFunc("GET /get/{id}", paymentHandler.GetByID)
 
 	//graceful shutdown
 	shutdownChan := make(chan os.Signal, 1)
